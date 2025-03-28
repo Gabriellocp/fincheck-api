@@ -7,6 +7,13 @@ export class UsersService {
 
   }
 
+  async getUserById(id: string) {
+    const user = await this.userRepo.findById(id)
+    return {
+      name: user?.name,
+      email: user?.email
+    }
+  }
 
 
 }
