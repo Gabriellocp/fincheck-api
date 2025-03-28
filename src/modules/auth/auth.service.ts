@@ -2,7 +2,7 @@ import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcryptjs';
 import { UserRepository } from 'src/shared/database/repositories/users.repositories';
-import { AuthenticateDto } from './dto/authenticate.dto';
+import { SignInDto } from './dto/signin.dto';
 import { SignUpDto } from './dto/signup.dto';
 
 @Injectable()
@@ -15,9 +15,13 @@ export class AuthService {
     ) {
 
     }
-
-    async authenticate(authenticateDto: AuthenticateDto) {
-        const { email, password } = authenticateDto
+    private async generateAccessToken(id: string) {
+        const payload = { sub: id }
+        const accessToken = await this.jswService.signAsync(payload)
+        return accessToken
+    }
+    async authenticate(signInDto: SignInDto) {
+        const { email, password } = signInDto
         const user = await this.userRepo.findByEmail(email)
         if (!user) {
             throw new UnauthorizedException("Invalid credentials")
@@ -26,8 +30,7 @@ export class AuthService {
         if (isPassValid) {
             throw new UnauthorizedException("Invalid credentials")
         }
-        const payload = { sub: user.id }
-        const accessToken = await this.jswService.signAsync(payload)
+        const accessToken = await this.generateAccessToken(user.id)
         return { accessToken }
     }
 
@@ -38,7 +41,7 @@ export class AuthService {
             throw new ConflictException('This email is already in use')
         }
         const hashedPass = await hash(password, 12)
-        await this.userRepo.create({
+        const user = await this.userRepo.create({
             data: {
                 name: name,
                 email: email,
@@ -66,6 +69,8 @@ export class AuthService {
             }
         })
 
-        return 'This action adds a new user';
+        const accessToken = await this.generateAccessToken(user.id)
+        return { accessToken }
+
     }
 }
