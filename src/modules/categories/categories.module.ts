@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { CategoriesController } from './categories.controller';
-import { CategoriesService } from './categories.service';
+import { CategoriesService } from './services/categories.service';
+import { ValidateCategoriesOwnershipService } from './services/validate-categories-ownership.service';
 
 @Module({
   controllers: [CategoriesController],
-  providers: [CategoriesService],
+  providers: [CategoriesService, ValidateCategoriesOwnershipService],
+  exports: [ValidateCategoriesOwnershipService]
 })
 export class CategoriesModule { }

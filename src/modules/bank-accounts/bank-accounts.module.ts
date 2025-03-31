@@ -6,5 +6,6 @@ import { ValdiateBankAccountOwnershipService } from './services/validate-bank-ac
 @Module({
   controllers: [BankAccountsController],
   providers: [BankAccountsService, ValdiateBankAccountOwnershipService],
+  exports: [ValdiateBankAccountOwnershipService]
 })
 export class BankAccountsModule { }
