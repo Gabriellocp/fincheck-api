@@ -15,9 +15,27 @@ export class BankAccountsService {
     return this.bankAccountsRepo.create(userId, createBankAccountDto)
   }
 
-  findAllByUserId(userId: string) {
-    return this.bankAccountsRepo.findMany({
-      where: { userId }
+  async findAllByUserId(userId: string) {
+    const accounts = await this.bankAccountsRepo.findMany({
+      where: { userId },
+      include: {
+        Transaction: {
+          select: {
+            value: true,
+            type: true
+          }
+        }
+      }
+    })
+
+    return accounts.map(({ Transaction: transactions, ...account }) => {
+      const currentBalance = transactions.reduce((acc, transaction) => {
+        return acc += transaction.value * (transaction.type === 'INCOME' ? 1 : -1)
+      }, 0)
+      return {
+        ...account, currentBalance
+      }
+
     })
   }
 
