@@ -31,7 +31,7 @@ export class BankAccountsService {
     return accounts.map(({ Transaction: transactions, ...account }) => {
       const currentBalance = transactions.reduce((acc, transaction) => {
         return acc += transaction.value * (transaction.type === 'INCOME' ? 1 : -1)
-      }, 0)
+      }, account.initialBalance)
       return {
         ...account, currentBalance
       }
