@@ -33,6 +33,15 @@ export class TransactionsService {
         },
         bankAccountId,
         type
+      },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            icon: true
+          }
+        }
       }
     })
   }
